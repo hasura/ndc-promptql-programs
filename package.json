@@ -1,0 +1,37 @@
+{
+  "name": "promptql-programs",
+  "version": "0.1.0",
+  "description": "NDC Connector to invoke PromptQL Programs (Automations)",
+  "main": "dist/cli/root.js",
+  "bin": {
+    "ndc-promptql-programs": "./dist/cli/root.js"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "compile": "tsc",
+    "install-bin": "npm test && npm run compile && npm install -g .",
+    "install-bin-unsafe": "npm run compile && npm install -g .",
+    "format": "npx prettier . --write",
+    "ndc-promptql-programs": "HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH=$(pwd) node ./dist/cli/root.js",
+    "build-plugin-image": "docker build -t sandeepsambahasura/promptql-programs:v0.1.0 .",
+    "build-connector-tgz": "tar -czf connector-definition.tgz -C connector-definition ." 
+  },
+  "author": "hasura",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
+    "@types/jest": "^30.0.0",
+    "@types/lodash": "^4.17.20",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "commander": "^14.0.0",
+    "json-schema-to-typescript": "^15.0.4",
+    "lodash": "^4.17.21",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.1.1"
+  }
+}

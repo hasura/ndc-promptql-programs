@@ -1,0 +1,10 @@
+./node_modules/**
+./dist/**
+
+# test files
+**/test-data/**
+./tests/**
+**/*.test.ts
+
+# scripts
+./scripts/**

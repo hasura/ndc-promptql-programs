@@ -1,0 +1,34 @@
+packagingDefinition:
+  type: ManagedDockerBuild
+supportedEnvironmentVariables:
+  - name: PROMPTQL_EXECUTE_PROGRAM_ENDPOINT
+    description: "The Execute Program endpoint of your DDN. Read more at https://promptql.io/docs/promptql-apis/execute-program-api/#execute-program-endpoint"
+    required: true
+  - name: PROMPTQL_API_KEY
+    description: "API key for your PromptQL project. Can be created from the PromptQL console at Settings->PromptQL->Generate New API Key"
+    required: true
+  - name: PROMPTQL_BUILD_VERSION
+    description: "(Optional) Build version against which the Program is executed. If not provided, the applied build is used."
+  - name: PROGRAM_EXECUTION_TIMEOUT
+    description: "Program execution timeout in seconds."
+commands:
+  update:
+    type: Dockerized
+    dockerImage: sandeepsambahasura/promptql-programs:v0.1.0
+    commandArgs: ["update"]
+cliPlugin:
+  type: Docker
+  dockerImage: sandeepsambahasura/promptql-programs:v0.1.0
+dockerComposeWatch:
+  # Rebuild the container if a new package restore is required because package[-lock].json changed
+  - path: package.json
+    target: /functions/package.json
+    action: rebuild
+  - path: package-lock.json
+    target: /functions/package-lock.json
+    action: rebuild
+  # For any other file change, simply copy it into the existing container and restart it
+  - path: ./
+    target: /functions
+    action: sync+restart
+    exclude: swagger.json
