@@ -25,7 +25,8 @@ ddn connector init promptql_programs --from-package <path-to-connector-definitio
 ``` 
 Docs for getting execute program API endpoint details - https://promptql.io/docs/promptql-apis/execute-program-api/
 - Add Argument presets to the connector for header forwarding
-Add the following to `promptql_programs.hml` fileunder `definition` section to enable header forwarding. (Even if you don't need header forwarding add a dummy configuration)
+
+Add the following to `promptql_programs.hml` file under `definition` section to enable header forwarding. (Even if you don't need header forwarding add a dummy configuration)
 ```yaml
 argumentPresets:
     - argument: headers
@@ -36,6 +37,7 @@ argumentPresets:
           additional: {}
 ```
 - Add the Automation JSON Artifact
+
 Download the Automation as a JSON artifact from the PromptQL console and place it in the `app/connector/promptql_programs/programs` directory. A sample automation JSON is available in the `sample-automation` directory.
 - Introspect the connector
 ```bash
