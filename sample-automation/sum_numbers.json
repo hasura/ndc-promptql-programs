@@ -1,0 +1,33 @@
+{
+  "identifier": "sum_numbers",
+  "title": "sum_numbers",
+  "artifact_type": "automation",
+  "data": {
+    "code": "# Identifier: sum_numbers\n# Input Schema: {\"type\": \"array\", \"items\": {\"type\": \"object\", \"properties\": {\"number1\": {\"type\": \"number\"}, \"number2\": {\"type\": \"number\"}}}}\n# Output Schema: {\"type\": \"array\", \"items\": {\"type\": \"object\", \"properties\": {\"sum\": {\"type\": \"number\"}}}}\n\n# Get input data\ninput_data = executor.get_artifact('input')\nnumber1 = input_data[0]['number1']\nnumber2 = input_data[0]['number2']\n\n# Calculate sum\nresult = [{'sum': number1 + number2}]\n\n# Store the result\nexecutor.store_artifact('output', 'Sum Result', 'table', result)",
+    "input_schema": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "number1": {
+            "type": "number"
+          },
+          "number2": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sum": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}
