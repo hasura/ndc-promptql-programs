@@ -11,6 +11,9 @@ supportedEnvironmentVariables:
     description: "(Optional) Build version against which the Program is executed. If not provided, the applied build is used."
   - name: PROGRAM_EXECUTION_TIMEOUT
     description: "Program execution timeout in seconds."
+  - name: ALLOW_RELAXED_TYPES
+    description: "Allow relaxed types when generating OPENDD schema"
+    defaultValue: "false"
 commands:
   update:
     type: Dockerized

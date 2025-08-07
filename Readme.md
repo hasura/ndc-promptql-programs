@@ -3,6 +3,7 @@ This connector allows you to invoke PromptQL Programs (Automations) as commands.
 
 # Current Limitations
 - The connector is not yet published to NDC hub. So Cloud builds will not work. Local usage with PromptQL playground is supported.
+- If the Input or output schema of a program results in types that are [not supported](https://github.com/hasura/ndc-nodejs-lambda?tab=readme-ov-file#unsupported-types) by the NDC Nodejs lambda connector, the program will not be available to track as a command. (For eg. If one of the field in the program input is an enum, it results in an Union type for that field in TS. As Union types are not supported by the NDC Nodejs lambda connector (without the the relaxed types hack, which anyway is not usable with PromptQL), the program will not be available to track as a command. To get around this, change the schema to use a string instead of enum and add the possible values of this enum as a description in the Command/Object Type for PromptQL to use.)
 
 # How to use
 - Build the DDN CLI plugin Docker image

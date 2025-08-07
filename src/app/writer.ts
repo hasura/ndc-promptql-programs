@@ -18,7 +18,7 @@ const FunctionName = (title: string): string => {
 };
 
 export const GenerateTypes = async (
-  automations: Automation[],
+  automations: Automation[]
 ): Promise<string> => {
   const types: string[] = [];
   for (const automation of automations) {
@@ -46,6 +46,7 @@ export const GenerateTypes = async (
 
 export const GenerateFunctions = async (
   automations: Automation[],
+  allowRelaxedTypes = false
 ): Promise<string> => {
   let out = `import * as sdk from "@hasura/ndc-lambda-sdk";
 import * as types from "./types";
@@ -63,11 +64,21 @@ const executeProgramEndpoint = utils.mustEnv(
     const functionName = FunctionName(automation.config.title);
     const inputTypeName = InputTypeName(functionName);
     const outputTypeName = OutputTypeName(functionName);
-    const functionStr = `export async function ${functionName}(
-    headers: sdk.JSONValue,
+    const relaxedTypesComment = `/**
+ * @allowrelaxedtypes
+ */
+`;
+    let functionStr = "";
+    if (allowRelaxedTypes) {
+      functionStr = relaxedTypesComment;
+    }
+    functionStr =
+      functionStr +
+      `export async function ${functionName}(
+  headers: sdk.JSONValue,
   input: types.${inputTypeName}
-    ): Promise<utils.ProgramOutput<types.${outputTypeName}>> {
-    const code = \`${automation.config.data.code}\`;
+): Promise<utils.ProgramOutput<types.${outputTypeName}>> {
+  const code = \`${automation.config.data.code}\`;
   const body = utils.prepareExecuteProgramBody(
     headers,
     input,
@@ -93,5 +104,8 @@ export const WriteStrToFile = async (str: string, filePath: string) => {
   await fs.promises.mkdir(dir, { recursive: true });
 
   // Write the file
-  await fs.promises.writeFile(filePath, str, "utf8");
+  await fs.promises.writeFile(filePath, str, { encoding: "utf8" });
+
+  // Explicitly set permissions to -rw-rw-rw-
+  await fs.promises.chmod(filePath, 0o666);
 };
