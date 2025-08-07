@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to build and push'
+        description: "Version to build and push"
         required: true
         type: string
 
@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         env:
@@ -41,5 +41,4 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ inputs.version }} \
             --push \
-            --annotation "index:org.opencontainers.image.description=NDC Connector to invoke PromptQL Programs (Automations)" \
             .

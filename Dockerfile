@@ -31,4 +31,7 @@ WORKDIR /etc/connector/
 # Switch to non-root user
 USER appuser
 
+LABEL org.opencontainers.image.source=https://github.com/hasura/ndc-promptql-programs
+LABEL org.opencontainers.image.description="NDC Connector to invoke PromptQL Programs (Automations)"
+
 ENTRYPOINT [ "ndc-promptql-programs" ]
