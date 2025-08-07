@@ -17,6 +17,13 @@ const FunctionName = (title: string): string => {
   return camelCase(title);
 };
 
+const escapeCodeForTemplateLiteral = (code: string): string => {
+  return code
+    .replace(/\\/g, '\\\\')  // Escape backslashes
+    .replace(/`/g, '\\`')    // Escape backticks
+    .replace(/\$/g, '\\$');  // Escape dollar signs
+};
+
 export const GenerateTypes = async (
   automations: Automation[]
 ): Promise<string> => {
@@ -78,7 +85,7 @@ const executeProgramEndpoint = utils.mustEnv(
   headers: sdk.JSONValue,
   input: types.${inputTypeName}
 ): Promise<utils.ProgramOutput<types.${outputTypeName}>> {
-  const code = \`${automation.config.data.code}\`;
+  const code = \`${escapeCodeForTemplateLiteral(automation.config.data.code)}\`;
   const body = utils.prepareExecuteProgramBody(
     headers,
     input,
