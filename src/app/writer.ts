@@ -59,18 +59,18 @@ const executeProgramEndpoint = utils.mustEnv(
 );
 
 `;
+  const relaxedTypesComment = `/**
+ * @allowrelaxedtypes
+ */
+`;
   let functions: string[] = [];
   for (const automation of automations) {
     const functionName = FunctionName(automation.config.title);
     const inputTypeName = InputTypeName(functionName);
     const outputTypeName = OutputTypeName(functionName);
-    const relaxedTypesComment = `/**
- * @allowrelaxedtypes
- */
-`;
     let functionStr = "";
     if (allowRelaxedTypes) {
-      functionStr = relaxedTypesComment;
+      functionStr = functionStr + relaxedTypesComment;
     }
     functionStr =
       functionStr +
