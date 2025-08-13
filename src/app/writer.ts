@@ -53,7 +53,8 @@ export const GenerateTypes = async (
 
 export const GenerateFunctions = async (
   automations: Automation[],
-  allowRelaxedTypes = false
+  allowRelaxedTypes = false,
+  readOnly = false
 ): Promise<string> => {
   let out = `import * as sdk from "@hasura/ndc-lambda-sdk";
 import * as types from "./types";
@@ -66,19 +67,20 @@ const executeProgramEndpoint = utils.mustEnv(
 );
 
 `;
-  const relaxedTypesComment = `/**
- * @allowrelaxedtypes
- */
-`;
+  const buildAnnotationsComment = (allowRelaxed: boolean, ro: boolean): string => {
+    const lines: string[] = [];
+    if (allowRelaxed) lines.push(" * @allowrelaxedtypes");
+    if (ro) lines.push(" * @readonly");
+    if (lines.length === 0) return "";
+    return `/**\n${lines.join("\n")}\n */\n`;
+  };
   let functions: string[] = [];
   for (const automation of automations) {
     const functionName = FunctionName(automation.config.title);
     const inputTypeName = InputTypeName(functionName);
     const outputTypeName = OutputTypeName(functionName);
     let functionStr = "";
-    if (allowRelaxedTypes) {
-      functionStr = functionStr + relaxedTypesComment;
-    }
+    functionStr += buildAnnotationsComment(allowRelaxedTypes, readOnly);
     functionStr =
       functionStr +
       `export async function ${functionName}(

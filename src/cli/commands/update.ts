@@ -28,16 +28,31 @@ export function UpdateCommand(): Command {
         .preset("true")
         .env("ALLOW_RELAXED_TYPES")
     )
+    .addOption(
+      new Option(
+        "--read-only [bool]",
+        "Set functions as read-only"
+      )
+        .default(true)
+        .choices(["true", "false"])
+        .preset("true")
+        .env("READ_ONLY")
+    )
     .action(async (args, cmd) => {
       const allowRelaxedTypes = args.allowRelaxedTypes === "true";
+      const readOnly = args.readOnly === "true";
       if (allowRelaxedTypes) {
         logger.warn("Allowing relaxed types");
+      }
+      if (readOnly) {
+        logger.warn("Setting functions as read-only");
       }
       const automations = await ReadArtifactFiles(getPromptQLProgramsRootDir());
       const types = await GenerateTypes(automations);
       const functionsStr = await GenerateFunctions(
         automations,
-        allowRelaxedTypes
+        allowRelaxedTypes,
+        readOnly
       );
       await WriteStrToFile(types, getOutputFilePath("types.ts"));
       await WriteStrToFile(functionsStr, getOutputFilePath("functions.ts"));
