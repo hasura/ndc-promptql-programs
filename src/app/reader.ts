@@ -13,7 +13,7 @@ export const ReadArtifactFiles = async (
     throw new Error(`Directory does not exist: ${rootDir}`);
   }
 
-  let programConfigs: ProgramConfigFile;
+  let programConfigs: ProgramConfigFile = {};
   if (fs.existsSync(configFilePath)) {
     logger.debug(`Configuration file does not exist: ${configFilePath}`);
     try {

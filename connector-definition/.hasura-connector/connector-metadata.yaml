@@ -14,14 +14,17 @@ supportedEnvironmentVariables:
   - name: ALLOW_RELAXED_TYPES
     description: "Allow relaxed types when generating OPENDD schema"
     defaultValue: "false"
+  - name: DEFAULT_READONLY
+    description: "Mark functions as readonly by default. Can be overridden by the program config."
+    defaultValue: "true"
 commands:
   update:
     type: Dockerized
-    dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.2.0
+    dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.3.0
     commandArgs: ["update"]
 cliPlugin:
   type: Docker
-  dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.2.0
+  dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.3.0
 dockerComposeWatch:
   # Rebuild the container if a new package restore is required because package[-lock].json changed
   - path: package.json

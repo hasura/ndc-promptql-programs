@@ -113,7 +113,7 @@ function getFunctionCommentStr(comment: {
   allowRelaxedTypes?: boolean;
   programConfig?: ProgramConfiguration;
 }): string {
-  const commentStr = [`/**`];
+  const commentStr: string[] = [];
   let isReadonly = comment.readonlyDefault;
   if (comment.programConfig?.readonly !== undefined) {
     isReadonly = comment.programConfig.readonly;
@@ -127,9 +127,10 @@ function getFunctionCommentStr(comment: {
   if (comment.allowRelaxedTypes) {
     commentStr.push(` * @allowrelaxedtypes`);
   }
-
-  commentStr.push(` */`);
-  return commentStr.join(os.EOL) + os.EOL;
+  if (commentStr.length === 0) {
+    return "";
+  }
+  return `/**${os.EOL}` + commentStr.join(os.EOL) + `${os.EOL} */${os.EOL}`;
 }
 
 export const WriteStrToFile = async (str: string, filePath: string) => {
