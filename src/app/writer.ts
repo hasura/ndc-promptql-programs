@@ -1,5 +1,5 @@
 import { camelCase, upperFirst } from "lodash";
-import { Automation } from "../automation";
+import { Automation, ProgramConfiguration } from "../automation";
 import { compile } from "json-schema-to-typescript";
 import os from "os";
 import fs from "fs";
@@ -19,21 +19,21 @@ const FunctionName = (title: string): string => {
 
 const escapeCodeForTemplateLiteral = (code: string): string => {
   return code
-    .replace(/\\/g, '\\\\')  // Escape backslashes
-    .replace(/`/g, '\\`')    // Escape backticks
-    .replace(/\$/g, '\\$');  // Escape dollar signs
+    .replace(/\\/g, "\\\\") // Escape backslashes
+    .replace(/`/g, "\\`") // Escape backticks
+    .replace(/\$/g, "\\$"); // Escape dollar signs
 };
 
 export const GenerateTypes = async (
-  automations: Automation[]
+  automations: Automation[],
 ): Promise<string> => {
   const types: string[] = [];
   for (const automation of automations) {
-    const functionName = FunctionName(automation.config.title);
+    const functionName = FunctionName(automation.artifact.title);
     const inputTypeName = InputTypeName(functionName);
     const outputTypeName = OutputTypeName(functionName);
-    const inputSchema = automation.config.data.input_schema;
-    const outputSchema = automation.config.data.output_schema;
+    const inputSchema = automation.artifact.data.input_schema;
+    const outputSchema = automation.artifact.data.output_schema;
     const inputTypeStr = await compile(inputSchema, inputTypeName, {
       additionalProperties: false,
       bannerComment: "",
@@ -53,7 +53,8 @@ export const GenerateTypes = async (
 
 export const GenerateFunctions = async (
   automations: Automation[],
-  allowRelaxedTypes = false
+  allowRelaxedTypes = false,
+  readonlyDefault = true,
 ): Promise<string> => {
   let out = `import * as sdk from "@hasura/ndc-lambda-sdk";
 import * as types from "./types";
@@ -66,18 +67,20 @@ const executeProgramEndpoint = utils.mustEnv(
 );
 
 `;
-  const relaxedTypesComment = `/**
- * @allowrelaxedtypes
- */
-`;
+
   let functions: string[] = [];
   for (const automation of automations) {
-    const functionName = FunctionName(automation.config.title);
+    const functionName = FunctionName(automation.artifact.title);
     const inputTypeName = InputTypeName(functionName);
     const outputTypeName = OutputTypeName(functionName);
     let functionStr = "";
-    if (allowRelaxedTypes) {
-      functionStr = functionStr + relaxedTypesComment;
+    const comment = getFunctionCommentStr({
+      readonlyDefault: readonlyDefault,
+      allowRelaxedTypes,
+      programConfig: automation.programConfig,
+    });
+    if (comment) {
+      functionStr = functionStr + comment;
     }
     functionStr =
       functionStr +
@@ -85,7 +88,7 @@ const executeProgramEndpoint = utils.mustEnv(
   headers: sdk.JSONValue,
   input: types.${inputTypeName}
 ): Promise<utils.ProgramOutput<types.${outputTypeName}>> {
-  const code = \`${escapeCodeForTemplateLiteral(automation.config.data.code)}\`;
+  const code = \`${escapeCodeForTemplateLiteral(automation.artifact.data.code)}\`;
   const body = utils.prepareExecuteProgramBody(
     headers,
     input,
@@ -104,6 +107,31 @@ const executeProgramEndpoint = utils.mustEnv(
   out += functions.join(os.EOL);
   return out;
 };
+
+function getFunctionCommentStr(comment: {
+  readonlyDefault: boolean;
+  allowRelaxedTypes?: boolean;
+  programConfig?: ProgramConfiguration;
+}): string {
+  const commentStr: string[] = [];
+  let isReadonly = comment.readonlyDefault;
+  if (comment.programConfig?.readonly !== undefined) {
+    isReadonly = comment.programConfig.readonly;
+  }
+  if (comment.programConfig?.description) {
+    commentStr.push(` * ${comment.programConfig?.description}`);
+  }
+  if (isReadonly) {
+    commentStr.push(` * @readonly`);
+  }
+  if (comment.allowRelaxedTypes) {
+    commentStr.push(` * @allowrelaxedtypes`);
+  }
+  if (commentStr.length === 0) {
+    return "";
+  }
+  return `/**${os.EOL}` + commentStr.join(os.EOL) + `${os.EOL} */${os.EOL}`;
+}
 
 export const WriteStrToFile = async (str: string, filePath: string) => {
   // Create directory if it doesn't exist

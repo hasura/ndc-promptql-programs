@@ -9,7 +9,7 @@ describe("GenerateTypes", () => {
     const mockAutomations: Automation[] = [
       {
         fileName: "test.json",
-        config: {
+        artifact: {
           identifier: "sum_numbers",
           title: "sum_numbers",
           artifact_type: "automation",
@@ -65,7 +65,7 @@ describe("GenerateFunctions", () => {
     const mockAutomations: Automation[] = [
       {
         fileName: "test.json",
-        config: {
+        artifact: {
           identifier: "sum_numbers",
           title: "sum_numbers",
           artifact_type: "automation",
@@ -113,11 +113,14 @@ const executeProgramEndpoint = utils.mustEnv(
   "PROMPTQL_EXECUTE_PROGRAM_ENDPOINT"
 );
 
+/**
+ * @readonly
+ */
 export async function sumNumbers(
-    headers: sdk.JSONValue,
+  headers: sdk.JSONValue,
   input: types.SumNumbersInput
-    ): Promise<utils.ProgramOutput<types.SumNumbersOutput>> {
-    const code = \`# Identifier: sum_numbers\n# Input Schema: {"type": "array", "items": {"type": "object", "properties": {"number1": {"type": "number"}, "number2": {"type": "number"}}}}\n# Output Schema: {"type": "array", "items": {"type": "object", "properties": {"sum": {"type": "number"}}}}\n\n# Get input data\ninput_data = executor.get_artifact(\'input\')\nnumber1 = input_data[0][\'number1\']\nnumber2 = input_data[0][\'number2\']\n\n# Calculate sum\nresult = [{\'sum\': number1 + number2}]\n\n# Store the result\nexecutor.store_artifact(\'output\', \'Sum Result\', \'table\', result)\`;
+): Promise<utils.ProgramOutput<types.SumNumbersOutput>> {
+  const code = \`# Identifier: sum_numbers\n# Input Schema: {"type": "array", "items": {"type": "object", "properties": {"number1": {"type": "number"}, "number2": {"type": "number"}}}}\n# Output Schema: {"type": "array", "items": {"type": "object", "properties": {"sum": {"type": "number"}}}}\n\n# Get input data\ninput_data = executor.get_artifact(\'input\')\nnumber1 = input_data[0][\'number1\']\nnumber2 = input_data[0][\'number2\']\n\n# Calculate sum\nresult = [{\'sum\': number1 + number2}]\n\n# Store the result\nexecutor.store_artifact(\'output\', \'Sum Result\', \'table\', result)\`;
   const body = utils.prepareExecuteProgramBody(
     headers,
     input,
