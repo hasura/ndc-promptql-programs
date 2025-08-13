@@ -18,11 +18,26 @@ export type Automation = {
   programConfig?: ProgramConfiguration;
 };
 
+/**
+ * Configuration for generating the function for the program.
+ */
 export type ProgramConfiguration = {
+  /**
+   * Mark the function as readonly.
+   */
   readonly?: boolean;
+  /**
+   * Description of the function.
+   */
   description?: string;
 };
 
-export type ProgramConfigFile = {
-  [programIdentifier: string]: ProgramConfiguration;
+export type ProgramConfigs = {
+  $schema: string | null;
+  /**
+   * Program Configuration. Program identifier is the key for each config.
+   */
+  programs?: {
+    [programIdentifier: string]: ProgramConfiguration;
+  };
 };

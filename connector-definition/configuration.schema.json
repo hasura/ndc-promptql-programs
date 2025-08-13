@@ -1,0 +1,38 @@
+{
+  "$ref": "#/definitions/ProgramConfigs",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ProgramConfigs": {
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "type": ["string", "null"]
+        },
+        "programs": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ProgramConfiguration"
+          },
+          "description": "Program Configuration. Program identifier is the key for each config.",
+          "type": "object"
+        }
+      },
+      "required": ["$schema"],
+      "type": "object"
+    },
+    "ProgramConfiguration": {
+      "additionalProperties": false,
+      "description": "Configuration for generating the function for the program.",
+      "properties": {
+        "description": {
+          "description": "Description of the function.",
+          "type": "string"
+        },
+        "readonly": {
+          "description": "Mark the function as readonly.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

@@ -1,1 +1,4 @@
-{}
+{
+  "$schema": "configuration.schema.json",
+  "programs": {}
+}

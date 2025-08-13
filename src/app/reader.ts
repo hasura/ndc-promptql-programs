@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import camelCase from "lodash/camelCase";
-import { Artifact, Automation, ProgramConfigFile } from "../automation";
+import { Artifact, Automation, ProgramConfigs } from "../automation";
 import * as logger from "../util/logger";
 
 export const ReadArtifactFiles = async (
@@ -13,13 +13,13 @@ export const ReadArtifactFiles = async (
     throw new Error(`Directory does not exist: ${rootDir}`);
   }
 
-  let programConfigs: ProgramConfigFile = {};
+  let programConfigs: ProgramConfigs = { $schema: null, programs: {} };
   if (fs.existsSync(configFilePath)) {
     logger.debug(`Configuration file does not exist: ${configFilePath}`);
     try {
       programConfigs = JSON.parse(
         await fs.promises.readFile(configFilePath, "utf-8"),
-      ) as ProgramConfigFile;
+      ) as ProgramConfigs;
     } catch (e) {
       logger.warn(`Failed to read program configuration file: ${e}`);
     }
@@ -46,7 +46,7 @@ export const ReadArtifactFiles = async (
           automations.push({
             fileName: fullPath,
             artifact: artifact,
-            programConfig: programConfigs[artifact.identifier],
+            programConfig: programConfigs.programs?.[artifact.identifier],
           });
         } catch (e) {
           throw new Error(`Failed to read or parse ${fullPath}: ${e}`);
