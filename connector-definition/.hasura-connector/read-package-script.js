@@ -10,7 +10,9 @@ const cwd = process.cwd();
 const packageJsonPath = path.join(cwd, "./package.json");
 
 if (process.argv.length < 3) {
-  console.error("Error: Pass the name of script command you want to read as the first command line arg.");
+  console.error(
+    "Error: Pass the name of script command you want to read as the first command line arg.",
+  );
   console.error("Usage: node read-package-script.js <name>");
   process.exit(1);
 }
@@ -21,7 +23,9 @@ try {
   const packageJson = JSON.parse(packageJsonText);
   const script = packageJson.scripts[desiredScript];
   if (script === undefined) {
-    console.error(`Error: script ${desiredScript} not found in ${packageJsonPath}`)
+    console.error(
+      `Error: script ${desiredScript} not found in ${packageJsonPath}`,
+    );
   }
   console.log(script);
 } catch (e) {

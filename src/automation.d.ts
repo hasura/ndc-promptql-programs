@@ -14,5 +14,15 @@ export type Data = {
 
 export type Automation = {
   fileName: string;
-  config: Artifact;
+  artifact: Artifact;
+  programConfig?: ProgramConfiguration;
+};
+
+export type ProgramConfiguration = {
+  readonly?: boolean;
+  description?: string;
+};
+
+export type ProgramConfigFile = {
+  [programIdentifier: string]: ProgramConfiguration;
 };

@@ -13,7 +13,7 @@ export function prepareExecuteProgramBody<I>(
   headers: sdk.JSONValue,
   input: I,
   code: string,
-  buildVersion?: string
+  buildVersion?: string,
 ): ExecuteProgramBody<I> {
   const body: ExecuteProgramBody<I> = {
     version: "v2",
@@ -43,7 +43,7 @@ export function prepareExecuteProgramBody<I>(
 export async function makeExecuteProgramRequest<I, O>(
   body: ExecuteProgramBody<I>,
   apiKey: string,
-  executeProgramEndpoint: string
+  executeProgramEndpoint: string,
 ): Promise<ProgramOutput<O>> {
   try {
     const response = await axios.post<ProgramOutput<O>>(
@@ -56,7 +56,7 @@ export async function makeExecuteProgramRequest<I, O>(
         },
         timeout: getTimeout(),
         maxRedirects: 0,
-      }
+      },
     );
     if (response.status !== 200) {
       throw new Error(`HTTP error status: ${response.status}`);

@@ -14,7 +14,7 @@
     "format": "npx prettier . --write",
     "ndc-promptql-programs": "HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH=$(pwd) node ./dist/cli/root.js",
     "build-plugin-image": "docker build -t \"hasura/ndc-promptql-programs:v${PP_VERSION}\" .",
-    "build-connector-tgz": "tar -czf connector-definition.tgz -C connector-definition ." 
+    "build-connector-tgz": "tar -czf connector-definition.tgz -C connector-definition ."
   },
   "author": "hasura",
   "license": "ISC",

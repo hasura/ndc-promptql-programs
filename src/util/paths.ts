@@ -37,3 +37,7 @@ export function getPromptQLProgramsRootDir(): string {
 export function getOutputFilePath(fileName: string): string {
   return path.join(getUserMountedFilePath(), fileName);
 }
+
+export function getConfigurationFilePath(): string {
+  return path.join(getUserMountedFilePath(), "configuration.json");
+}
