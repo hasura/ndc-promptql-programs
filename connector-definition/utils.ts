@@ -44,11 +44,12 @@ function processErrorFromResponse<O>(
   output: ProgramOutput<O>
 ): ProgramOutput<O> {
   if (output.error) {
-    let errorMsg = `Program execution failed with error: ${output.error}. `;
-    if (output.output) {
-      errorMsg += `Output: ${output.output}`;
-    }
-    throw new Error(errorMsg);
+    throw new sdk.BadGateway(
+      `Program execution failed with error: ${output.error}`,
+      {
+        output: output.output,
+      }
+    );
   }
   return output;
 }
@@ -79,29 +80,31 @@ export async function makeExecuteProgramRequest<I, O>(
         // Server responded with error status
         const status = error.response.status;
         const data = error.response.data;
-        throw new Error(
-          `Program invocation failed with HTTP ${status}: ${JSON.stringify(
-            data
-          )}`
+        throw new sdk.BadGateway(
+          `Program invocation failed with HTTP ${status}`,
+          {
+            status,
+            data,
+          }
         );
       } else if (error.request) {
         // Network error or timeout
         if (error.code === "ECONNABORTED") {
-          throw new Error(
+          throw new sdk.BadGateway(
             `Program invocation timed out after ${getTimeout()}ms`
           );
         }
-        throw new Error(
+        throw new sdk.BadGateway(
           `Network error during program invocation: ${error.message}`
         );
       }
       // Unknown error
-      throw new Error(
+      throw new sdk.BadGateway(
         `Error occurred during program invocation: ${error.message}`
       );
     }
     // Re-throw unexpected errors with context
-    throw new Error(
+    throw new sdk.InternalServerError(
       `Program invocation error: ${
         error instanceof Error ? error.message : String(error)
       }`
