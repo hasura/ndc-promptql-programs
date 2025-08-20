@@ -13,7 +13,7 @@ export function prepareExecuteProgramBody<I>(
   headers: sdk.JSONValue,
   input: I,
   code: string,
-  buildVersion?: string,
+  buildVersion?: string
 ): ExecuteProgramBody<I> {
   const body: ExecuteProgramBody<I> = {
     version: "v2",
@@ -40,13 +40,27 @@ export function prepareExecuteProgramBody<I>(
   return body;
 }
 
+function processErrorFromResponse<O>(
+  output: ProgramOutput<O>
+): ProgramOutput<O> {
+  if (output.error) {
+    let errorMsg = `Program execution failed with error: ${output.error}. `;
+    if (output.output) {
+      errorMsg += `Output: ${output.output}`;
+    }
+    throw new Error(errorMsg);
+  }
+  return output;
+}
+
 export async function makeExecuteProgramRequest<I, O>(
   body: ExecuteProgramBody<I>,
   apiKey: string,
-  executeProgramEndpoint: string,
+  executeProgramEndpoint: string
 ): Promise<ProgramOutput<O>> {
+  let response;
   try {
-    const response = await axios.post<ProgramOutput<O>>(
+    response = await axios.post<ProgramOutput<O>>(
       executeProgramEndpoint,
       body,
       {
@@ -56,15 +70,44 @@ export async function makeExecuteProgramRequest<I, O>(
         },
         timeout: getTimeout(),
         maxRedirects: 0,
-      },
+        validateStatus: (status) => status === 200,
+      }
     );
-    if (response.status !== 200) {
-      throw new Error(`HTTP error status: ${response.status}`);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status;
+        const data = error.response.data;
+        throw new Error(
+          `Program invocation failed with HTTP ${status}: ${JSON.stringify(
+            data
+          )}`
+        );
+      } else if (error.request) {
+        // Network error or timeout
+        if (error.code === "ECONNABORTED") {
+          throw new Error(
+            `Program invocation timed out after ${getTimeout()}ms`
+          );
+        }
+        throw new Error(
+          `Network error during program invocation: ${error.message}`
+        );
+      }
+      // Unknown error
+      throw new Error(
+        `Error occurred during program invocation: ${error.message}`
+      );
     }
-    return response.data;
-  } catch (e) {
-    throw new Error(`Program Execution error: ${e}`);
+    // Re-throw unexpected errors with context
+    throw new Error(
+      `Program invocation error: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
   }
+  return processErrorFromResponse(response.data);
 }
 
 function getTimeout(): number {
