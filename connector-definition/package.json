@@ -1,4 +1,5 @@
 {
+  "name": "connector",
   "private": true,
   "engines": {
     "node": ">=20"
@@ -8,7 +9,7 @@
     "watch": "ndc-lambda-sdk host -f functions.ts --watch serve --configuration ./ --pretty-print-logs"
   },
   "dependencies": {
-    "@hasura/ndc-lambda-sdk": "1.13.0",
+    "@hasura/ndc-lambda-sdk": "1.16.0",
     "axios": "^1.8.4"
   },
   "devDependencies": {

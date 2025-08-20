@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import { UpdateCommand } from "./commands/update";
+import { UpgradeConfig } from "./commands/upgradeConfig";
 
 const program = new Command();
 program
@@ -9,8 +10,9 @@ program
   .description(
     "CLI to create NDC TS Lambda functions from PromptQL Program (Automations) artifact files",
   )
-  .version("0.1.0");
+  .version("0.4.0");
 
 program.addCommand(UpdateCommand());
+program.addCommand(UpgradeConfig());
 
 program.parseAsync();
