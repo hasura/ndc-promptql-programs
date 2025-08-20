@@ -4,17 +4,6 @@ FROM node:20-alpine
 RUN npm update -g npm
 RUN apk add bash jq curl
 
-# Create a non-privileged user
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-
 COPY ./ /app/
 WORKDIR /app/
 
@@ -27,9 +16,6 @@ RUN npm run install-bin-unsafe
 
 RUN mkdir /etc/connector/
 WORKDIR /etc/connector/
-
-# Switch to non-root user
-USER appuser
 
 LABEL org.opencontainers.image.source=https://github.com/hasura/ndc-promptql-programs
 LABEL org.opencontainers.image.description="NDC Connector to invoke PromptQL Programs (Automations)"

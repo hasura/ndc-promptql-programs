@@ -13,7 +13,7 @@ export function prepareExecuteProgramBody<I>(
   headers: sdk.JSONValue,
   input: I,
   code: string,
-  buildVersion?: string
+  buildVersion?: string,
 ): ExecuteProgramBody<I> {
   const body: ExecuteProgramBody<I> = {
     version: "v2",
@@ -41,14 +41,14 @@ export function prepareExecuteProgramBody<I>(
 }
 
 function processErrorFromResponse<O>(
-  output: ProgramOutput<O>
+  output: ProgramOutput<O>,
 ): ProgramOutput<O> {
   if (output.error) {
     throw new sdk.BadGateway(
       `Program execution failed with error: ${output.error}`,
       {
         output: output.output,
-      }
+      },
     );
   }
   return output;
@@ -57,7 +57,7 @@ function processErrorFromResponse<O>(
 export async function makeExecuteProgramRequest<I, O>(
   body: ExecuteProgramBody<I>,
   apiKey: string,
-  executeProgramEndpoint: string
+  executeProgramEndpoint: string,
 ): Promise<ProgramOutput<O>> {
   let response;
   try {
@@ -72,7 +72,7 @@ export async function makeExecuteProgramRequest<I, O>(
         timeout: getTimeout(),
         maxRedirects: 0,
         validateStatus: (status) => status === 200,
-      }
+      },
     );
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -85,29 +85,29 @@ export async function makeExecuteProgramRequest<I, O>(
           {
             status,
             data,
-          }
+          },
         );
       } else if (error.request) {
         // Network error or timeout
         if (error.code === "ECONNABORTED") {
           throw new sdk.BadGateway(
-            `Program invocation timed out after ${getTimeout()}ms`
+            `Program invocation timed out after ${getTimeout()}ms`,
           );
         }
         throw new sdk.BadGateway(
-          `Network error during program invocation: ${error.message}`
+          `Network error during program invocation: ${error.message}`,
         );
       }
       // Unknown error
       throw new sdk.BadGateway(
-        `Error occurred during program invocation: ${error.message}`
+        `Error occurred during program invocation: ${error.message}`,
       );
     }
     // Re-throw unexpected errors with context
     throw new sdk.InternalServerError(
       `Program invocation error: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     );
   }
   return processErrorFromResponse(response.data);

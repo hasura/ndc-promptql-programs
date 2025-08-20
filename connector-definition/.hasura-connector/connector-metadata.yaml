@@ -22,6 +22,10 @@ commands:
     type: Dockerized
     dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.4.0
     commandArgs: ["update"]
+  upgradeConfiguration:
+    type: Dockerized
+    dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.4.0
+    commandArgs: ["upgrade-configuration"]
 cliPlugin:
   type: Docker
   dockerImage: ghcr.io/hasura/ndc-promptql-programs:v0.4.0

@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import { UpdateCommand } from "./commands/update";
+import { UpgradeConfig } from "./commands/upgradeConfig";
 
 const program = new Command();
 program
@@ -12,5 +13,6 @@ program
   .version("0.1.0");
 
 program.addCommand(UpdateCommand());
+program.addCommand(UpgradeConfig());
 
 program.parseAsync();
