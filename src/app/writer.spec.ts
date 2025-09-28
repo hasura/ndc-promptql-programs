@@ -1,8 +1,14 @@
-import { GenerateTypes, GenerateFunctions, WriteStrToFile } from "./writer";
+import {
+  GenerateTypes,
+  GenerateFunctions,
+  WriteStrToFile,
+  addTitleToObjectInArray,
+} from "./writer";
 import { Automation } from "../automation";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { JSONSchema4 } from "json-schema";
 
 describe("GenerateTypes", () => {
   it("should generate TypeScript types from automation schemas", async () => {
@@ -47,14 +53,18 @@ describe("GenerateTypes", () => {
 
     const result = await GenerateTypes(mockAutomations);
     expect(
-      `export type SumNumbersFrom1To5Input = {
+      `export type SumNumbersFrom1To5Input = SumNumbersFrom1To5InputItem[];
+
+export interface SumNumbersFrom1To5InputItem {
   number1?: number;
   number2?: number;
-}[];
+}
 
-export type SumNumbersFrom1To5Output = {
+export type SumNumbersFrom1To5Output = SumNumbersFrom1To5OutputItem[];
+
+export interface SumNumbersFrom1To5OutputItem {
   sum?: number;
-}[];
+}
 `
     ).toEqual(result);
   });
@@ -194,5 +204,154 @@ describe("WriteStrToFile", () => {
         await fs.promises.rm(tempDir, { recursive: true, force: true });
       }
     }
+  });
+});
+
+describe("addTitleToObjectInArray", () => {
+  it("should add titles to objects in arrays at all nesting levels", () => {
+    const inputSchema = {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          orderId: {
+            type: "integer",
+          },
+          assignment: {
+            type: "object",
+            properties: {
+              selected: {
+                type: ["object", "null"],
+                properties: {
+                  rvu: {
+                    type: "number",
+                  },
+                  radId: {
+                    type: "integer",
+                  },
+                  radName: {
+                    type: "string",
+                  },
+                  preferenceRules: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        ruleId: {
+                          type: "integer",
+                        },
+                        ruleText: {
+                          type: "string",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              matchedRads: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    rvu: {
+                      type: "number",
+                    },
+                    radId: {
+                      type: "integer",
+                    },
+                    radName: {
+                      type: "string",
+                    },
+                    preference_score: {
+                      type: "number",
+                    },
+                  },
+                },
+              },
+              eligibleRads: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    rvu: {
+                      type: "number",
+                    },
+                    radId: {
+                      type: "integer",
+                    },
+                    radName: {
+                      type: "string",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          auditTrail: {
+            type: "object",
+            properties: {
+              steps: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    input: {
+                      type: "string",
+                    },
+                    output: {
+                      type: "string",
+                    },
+                    step_name: {
+                      type: "string",
+                    },
+                    step_result: {
+                      type: "string",
+                    },
+                  },
+                },
+              },
+              result_code: {
+                type: "string",
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const result = addTitleToObjectInArray(
+      inputSchema as JSONSchema4,
+      "Program"
+    );
+
+    // Root should get titles
+    expect(result.title).toBe("Program");
+
+    // Main array item should get title
+    expect((result.items as any).title).toBe("Program_item");
+
+    // Objects in arrays should get titles
+    expect(
+      (result.items as any).properties.assignment.properties.selected.properties
+        .preferenceRules.items.title
+    ).toBe("Program_item_assignment_selected_preferenceRules_item");
+    expect(
+      (result.items as any).properties.assignment.properties.matchedRads.items
+        .title
+    ).toBe("Program_item_assignment_matchedRads_item");
+    expect(
+      (result.items as any).properties.assignment.properties.eligibleRads.items
+        .title
+    ).toBe("Program_item_assignment_eligibleRads_item");
+    expect(
+      (result.items as any).properties.auditTrail.properties.steps.items.title
+    ).toBe("Program_item_auditTrail_steps_item");
+
+    // Regular object properties should NOT get titles
+    expect((result.items as any).properties.assignment.title).toBeUndefined();
+    expect(
+      (result.items as any).properties.assignment.properties.selected.title
+    ).toBeUndefined();
+    expect((result.items as any).properties.auditTrail.title).toBeUndefined();
   });
 });
