@@ -11,7 +11,7 @@ describe("GenerateTypes", () => {
         fileName: "test.json",
         artifact: {
           identifier: "sum_numbers",
-          title: "sum_numbers",
+          title: "Sum Numbers (From 1 to 5)",
           artifact_type: "automation",
           data: {
             code: '# Identifier: sum_numbers\n# Input Schema: {"type": "array", "items": {"type": "object", "properties": {"number1": {"type": "number"}, "number2": {"type": "number"}}}}\n# Output Schema: {"type": "array", "items": {"type": "object", "properties": {"sum": {"type": "number"}}}}\n\n# Get input data\ninput_data = executor.get_artifact(\'input\')\nnumber1 = input_data[0][\'number1\']\nnumber2 = input_data[0][\'number2\']\n\n# Calculate sum\nresult = [{\'sum\': number1 + number2}]\n\n# Store the result\nexecutor.store_artifact(\'output\', \'Sum Result\', \'table\', result)',
@@ -47,15 +47,15 @@ describe("GenerateTypes", () => {
 
     const result = await GenerateTypes(mockAutomations);
     expect(
-      `export type SumNumbersInput = {
+      `export type SumNumbersFrom1To5Input = {
   number1?: number;
   number2?: number;
 }[];
 
-export type SumNumbersOutput = {
+export type SumNumbersFrom1To5Output = {
   sum?: number;
 }[];
-`,
+`
     ).toEqual(result);
   });
 });
@@ -67,7 +67,7 @@ describe("GenerateFunctions", () => {
         fileName: "test.json",
         artifact: {
           identifier: "sum_numbers",
-          title: "sum_numbers",
+          title: "Sum Numbers (From 1 to 5)",
           artifact_type: "automation",
           data: {
             code: '# Identifier: sum_numbers\n# Input Schema: {"type": "array", "items": {"type": "object", "properties": {"number1": {"type": "number"}, "number2": {"type": "number"}}}}\n# Output Schema: {"type": "array", "items": {"type": "object", "properties": {"sum": {"type": "number"}}}}\n\n# Get input data\ninput_data = executor.get_artifact(\'input\')\nnumber1 = input_data[0][\'number1\']\nnumber2 = input_data[0][\'number2\']\n\n# Calculate sum\nresult = [{\'sum\': number1 + number2}]\n\n# Store the result\nexecutor.store_artifact(\'output\', \'Sum Result\', \'table\', result)',
@@ -116,10 +116,10 @@ const executeProgramEndpoint = utils.mustEnv(
 /**
  * @readonly
  */
-export async function sumNumbers(
+export async function sumNumbersFrom1To5(
   headers: sdk.JSONValue,
-  input: types.SumNumbersInput
-): Promise<utils.ProgramOutput<types.SumNumbersOutput>> {
+  input: types.SumNumbersFrom1To5Input
+): Promise<utils.ProgramOutput<types.SumNumbersFrom1To5Output>> {
   const code = \`# Identifier: sum_numbers\n# Input Schema: {"type": "array", "items": {"type": "object", "properties": {"number1": {"type": "number"}, "number2": {"type": "number"}}}}\n# Output Schema: {"type": "array", "items": {"type": "object", "properties": {"sum": {"type": "number"}}}}\n\n# Get input data\ninput_data = executor.get_artifact(\'input\')\nnumber1 = input_data[0][\'number1\']\nnumber2 = input_data[0][\'number2\']\n\n# Calculate sum\nresult = [{\'sum\': number1 + number2}]\n\n# Store the result\nexecutor.store_artifact(\'output\', \'Sum Result\', \'table\', result)\`;
   const body = utils.prepareExecuteProgramBody(
     headers,
@@ -128,8 +128,8 @@ export async function sumNumbers(
     buildVersion
   );
   const response = await utils.makeExecuteProgramRequest<
-    types.SumNumbersInput,
-    types.SumNumbersOutput
+    types.SumNumbersFrom1To5Input,
+    types.SumNumbersFrom1To5Output
   >(body, apiKey, executeProgramEndpoint);
   return response;
 }
@@ -172,7 +172,7 @@ describe("WriteStrToFile", () => {
     // Create a temporary directory for testing
     const tempDir = path.join(
       os.tmpdir(),
-      "test-writer-existing-" + Date.now(),
+      "test-writer-existing-" + Date.now()
     );
     const filePath = path.join(tempDir, "existing.txt");
     const testContent = "Content for existing directory";
