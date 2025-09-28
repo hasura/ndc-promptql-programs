@@ -65,7 +65,7 @@ export type SumNumbersFrom1To5Output = SumNumbersFrom1To5OutputItem[];
 export interface SumNumbersFrom1To5OutputItem {
   sum?: number;
 }
-`
+`,
     ).toEqual(result);
   });
 });
@@ -182,7 +182,7 @@ describe("WriteStrToFile", () => {
     // Create a temporary directory for testing
     const tempDir = path.join(
       os.tmpdir(),
-      "test-writer-existing-" + Date.now()
+      "test-writer-existing-" + Date.now(),
     );
     const filePath = path.join(tempDir, "existing.txt");
     const testContent = "Content for existing directory";
@@ -321,7 +321,7 @@ describe("addTitleToObjectInArray", () => {
 
     const result = addTitleToObjectInArray(
       inputSchema as JSONSchema4,
-      "Program"
+      "Program",
     );
 
     // Root should get titles
@@ -333,24 +333,24 @@ describe("addTitleToObjectInArray", () => {
     // Objects in arrays should get titles
     expect(
       (result.items as any).properties.assignment.properties.selected.properties
-        .preferenceRules.items.title
+        .preferenceRules.items.title,
     ).toBe("Program_item_assignment_selected_preferenceRules_item");
     expect(
       (result.items as any).properties.assignment.properties.matchedRads.items
-        .title
+        .title,
     ).toBe("Program_item_assignment_matchedRads_item");
     expect(
       (result.items as any).properties.assignment.properties.eligibleRads.items
-        .title
+        .title,
     ).toBe("Program_item_assignment_eligibleRads_item");
     expect(
-      (result.items as any).properties.auditTrail.properties.steps.items.title
+      (result.items as any).properties.auditTrail.properties.steps.items.title,
     ).toBe("Program_item_auditTrail_steps_item");
 
     // Regular object properties should NOT get titles
     expect((result.items as any).properties.assignment.title).toBeUndefined();
     expect(
-      (result.items as any).properties.assignment.properties.selected.title
+      (result.items as any).properties.assignment.properties.selected.title,
     ).toBeUndefined();
     expect((result.items as any).properties.auditTrail.title).toBeUndefined();
   });

@@ -27,7 +27,7 @@ const escapeCodeForTemplateLiteral = (code: string): string => {
 
 export const addTitleToObjectInArray = (
   schema: JSONSchema4,
-  rootTitle: string
+  rootTitle: string,
 ): JSONSchema4 => {
   // Deep clone the schema to avoid mutating the original
   const modifiedSchema = JSON.parse(JSON.stringify(schema));
@@ -36,7 +36,7 @@ export const addTitleToObjectInArray = (
   const processSchema = (
     currentSchema: JSONSchema4,
     parentPath: string[] = [],
-    isInArray: boolean = false
+    isInArray: boolean = false,
   ): JSONSchema4 => {
     // Only objects can have properties/titles
     if (typeof currentSchema !== "object" || currentSchema === null) {
@@ -48,7 +48,7 @@ export const addTitleToObjectInArray = (
     // Helper function to check if a type includes a specific type
     const includesType = (
       typeValue: string | string[] | undefined,
-      targetType: string
+      targetType: string,
     ): boolean => {
       if (!typeValue) return false;
       if (typeof typeValue === "string") return typeValue === targetType;
@@ -57,10 +57,7 @@ export const addTitleToObjectInArray = (
     };
 
     // Add title if this is an object inside an array
-    if (
-      isInArray &&
-      includesType(processed.type, "object")
-    ) {
+    if (isInArray && includesType(processed.type, "object")) {
       const titlePath = parentPath.length > 0 ? parentPath.join("_") : "item";
       const generatedTitle = `${rootTitle}_${titlePath}`;
 
@@ -80,14 +77,14 @@ export const addTitleToObjectInArray = (
           processSchema(
             item as JSONSchema4,
             [...parentPath, `item${idx}`],
-            true
-          )
+            true,
+          ),
         );
       } else {
         processed.items = processSchema(
           processed.items as JSONSchema4,
           [...parentPath, "item"],
-          true
+          true,
         );
       }
     }
@@ -96,12 +93,12 @@ export const addTitleToObjectInArray = (
     if (includesType(processed.type, "object") && processed.properties) {
       const newProperties: { [key: string]: JSONSchema4 } = {};
       for (const [propName, propSchema] of Object.entries(
-        processed.properties
+        processed.properties,
       )) {
         newProperties[propName] = processSchema(
           propSchema as JSONSchema4,
           [...parentPath, propName],
-          false
+          false,
         );
       }
       processed.properties = newProperties;
@@ -116,7 +113,7 @@ export const addTitleToObjectInArray = (
       processed.additionalProperties = processSchema(
         processed.additionalProperties as JSONSchema4,
         [...parentPath, "additionalProperties"],
-        false
+        false,
       );
     }
 
@@ -132,7 +129,7 @@ export const addTitleToObjectInArray = (
 };
 
 export const GenerateTypes = async (
-  automations: Automation[]
+  automations: Automation[],
 ): Promise<string> => {
   const types: string[] = [];
   for (const automation of automations) {
@@ -141,7 +138,7 @@ export const GenerateTypes = async (
     const outputTypeName = OutputTypeName(functionName);
     const inputSchema = addTitleToObjectInArray(
       automation.artifact.data.input_schema,
-      inputTypeName
+      inputTypeName,
     );
     const inputTypeStr = await compile(inputSchema as any, inputTypeName, {
       additionalProperties: false,
@@ -150,7 +147,7 @@ export const GenerateTypes = async (
     });
     const outputSchema = addTitleToObjectInArray(
       automation.artifact.data.output_schema,
-      outputTypeName
+      outputTypeName,
     );
     const outputTypeStr = await compile(outputSchema as any, outputTypeName, {
       additionalProperties: false,
@@ -167,7 +164,7 @@ export const GenerateTypes = async (
 export const GenerateFunctions = async (
   automations: Automation[],
   allowRelaxedTypes = false,
-  readonlyDefault = true
+  readonlyDefault = true,
 ): Promise<string> => {
   let out = `import * as sdk from "@hasura/ndc-lambda-sdk";
 import * as types from "./types";
