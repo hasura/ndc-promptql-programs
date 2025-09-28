@@ -56,14 +56,21 @@ export const addTitleToObjectInArray = (
       return false;
     };
 
-    // Add title if this is an object inside an array and doesn't have a title
+    // Add title if this is an object inside an array
     if (
       isInArray &&
-      includesType(processed.type, "object") &&
-      !processed.title
+      includesType(processed.type, "object")
     ) {
       const titlePath = parentPath.length > 0 ? parentPath.join("_") : "item";
-      processed.title = `${rootTitle}_${titlePath}`;
+      const generatedTitle = `${rootTitle}_${titlePath}`;
+
+      if (processed.title) {
+        // If title already exists, prefix it with the generated title
+        processed.title = `${generatedTitle}_${processed.title}`;
+      } else {
+        // If no title exists, use the generated title
+        processed.title = generatedTitle;
+      }
     }
 
     // Recurse into array items
