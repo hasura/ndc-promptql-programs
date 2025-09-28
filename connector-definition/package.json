@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@hasura/ndc-lambda-sdk": "1.16.0",
-    "axios": "^1.8.4"
+    "axios": "^1.12.0"
   },
   "devDependencies": {
     "dotenv-cli": "^7.4.2"
